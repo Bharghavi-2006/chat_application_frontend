@@ -38,7 +38,11 @@ const Portal = () => {
   const { room_code, username, password, messages } = location.state || {};
 
   const [allMessages, setAllMsg] = useState(messages || []);
-  const [messageNew, setMessage] = useState({ room_code, username, message: "" });
+  const [messageNew, setMessage] = useState({
+    room_code,
+    username,
+    message: "",
+  });
 
   const bottomRef = useRef(null);
   // Store credentials in a ref so fetchData never becomes stale
@@ -55,7 +59,7 @@ const Portal = () => {
   // Stable function — won't change between renders, safe to use in socket listener
   const fetchData = useCallback(async () => {
     try {
-      const res = await axios.get("http://localhost:3001/api/login", {
+      const res = await axios.get("/api/login", {
         params: formData.current,
       });
       if (res.data.data.messages.length > 0) {
@@ -98,11 +102,9 @@ const Portal = () => {
     e.preventDefault();
     if (!messageNew.message.trim()) return;
     try {
-      const res = await axios.post(
-        "http://localhost:3001/api/room",
-        messageNew,
-        { headers: { "Content-Type": "application/json" } }
-      );
+      const res = await axios.post("/api/room", messageNew, {
+        headers: { "Content-Type": "application/json" },
+      });
       setAllMsg(res.data.data.messages);
       socket.emit("send_message", { roomCode: room_code });
       setMessage((prev) => ({ ...prev, message: "" }));
@@ -123,7 +125,9 @@ const Portal = () => {
   const formatTime = (ts) => {
     if (!ts) return "";
     const d = new Date(ts);
-    return isNaN(d) ? "" : d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    return isNaN(d)
+      ? ""
+      : d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   };
 
   return (
@@ -150,20 +154,67 @@ const Portal = () => {
         >
           <HStack justify="space-between" align="center">
             <HStack spacing={4} align="center">
-              <Box bg="#111" border="1px solid #2a2a2a" borderRadius="8px" px={3} py={1}>
-                <Text fontFamily="'IBM Plex Mono', monospace" fontSize="11px" color="#666" letterSpacing="0.12em" textTransform="uppercase">Room</Text>
-                <Text fontFamily="'IBM Plex Mono', monospace" fontSize="18px" fontWeight="600" color="#fff" lineHeight="1.2" letterSpacing="0.05em">{room_code}</Text>
+              <Box
+                bg="#111"
+                border="1px solid #2a2a2a"
+                borderRadius="8px"
+                px={3}
+                py={1}
+              >
+                <Text
+                  fontFamily="'IBM Plex Mono', monospace"
+                  fontSize="11px"
+                  color="#666"
+                  letterSpacing="0.12em"
+                  textTransform="uppercase"
+                >
+                  Room
+                </Text>
+                <Text
+                  fontFamily="'IBM Plex Mono', monospace"
+                  fontSize="18px"
+                  fontWeight="600"
+                  color="#fff"
+                  lineHeight="1.2"
+                  letterSpacing="0.05em"
+                >
+                  {room_code}
+                </Text>
               </Box>
               <Box height="36px" width="1px" bg="#222" />
               <HStack spacing={2}>
-                <Box width="32px" height="32px" borderRadius="50%" bg="#1a1a1a" border="1px solid #2e2e2e" display="flex" alignItems="center" justifyContent="center">
-                  <Text fontSize="13px" fontWeight="600" color="#aaa">{username?.[0]?.toUpperCase()}</Text>
+                <Box
+                  width="32px"
+                  height="32px"
+                  borderRadius="50%"
+                  bg="#1a1a1a"
+                  border="1px solid #2e2e2e"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                >
+                  <Text fontSize="13px" fontWeight="600" color="#aaa">
+                    {username?.[0]?.toUpperCase()}
+                  </Text>
                 </Box>
-                <Text fontSize="14px" fontWeight="500" color="#ccc">{username}</Text>
+                <Text fontSize="14px" fontWeight="500" color="#ccc">
+                  {username}
+                </Text>
               </HStack>
             </HStack>
             <Link href="/" _hover={{ textDecoration: "none" }}>
-              <Button className="leave-btn" size="sm" variant="outline" borderColor="#2e2e2e" color="#999" bg="transparent" fontFamily="'IBM Plex Mono', monospace" fontSize="12px" letterSpacing="0.05em" px={4}>
+              <Button
+                className="leave-btn"
+                size="sm"
+                variant="outline"
+                borderColor="#2e2e2e"
+                color="#999"
+                bg="transparent"
+                fontFamily="'IBM Plex Mono', monospace"
+                fontSize="12px"
+                letterSpacing="0.05em"
+                px={4}
+              >
                 Leave Room
               </Button>
             </Link>
@@ -176,28 +227,86 @@ const Portal = () => {
             {allMessages && allMessages.length > 0 ? (
               allMessages.map((msg, index) => {
                 const mine = isMine(msg);
-                const prevSame = index > 0 && allMessages[index - 1].username === msg.username;
+                const prevSame =
+                  index > 0 && allMessages[index - 1].username === msg.username;
                 return (
-                  <Box key={index} className="msg-bubble" display="flex" justifyContent={mine ? "flex-end" : "flex-start"} mt={prevSame ? "2px" : "10px"}>
+                  <Box
+                    key={index}
+                    className="msg-bubble"
+                    display="flex"
+                    justifyContent={mine ? "flex-end" : "flex-start"}
+                    mt={prevSame ? "2px" : "10px"}
+                  >
                     {!mine && (
-                      <Box width="28px" height="28px" borderRadius="50%" bg="#1a1a1a" border="1px solid #2a2a2a" display="flex" alignItems="center" justifyContent="center" flexShrink={0} mr={2} mt="auto" opacity={prevSame ? 0 : 1}>
-                        <Text fontSize="11px" fontWeight="600" color="#777">{msg.username?.[0]?.toUpperCase()}</Text>
+                      <Box
+                        width="28px"
+                        height="28px"
+                        borderRadius="50%"
+                        bg="#1a1a1a"
+                        border="1px solid #2a2a2a"
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="center"
+                        flexShrink={0}
+                        mr={2}
+                        mt="auto"
+                        opacity={prevSame ? 0 : 1}
+                      >
+                        <Text fontSize="11px" fontWeight="600" color="#777">
+                          {msg.username?.[0]?.toUpperCase()}
+                        </Text>
                       </Box>
                     )}
                     <Box maxW="62%">
                       {!mine && !prevSame && (
-                        <Text fontFamily="'IBM Plex Mono', monospace" fontSize="10px" color="#555" letterSpacing="0.08em" mb="4px" ml="2px" textTransform="uppercase">{msg.username}</Text>
+                        <Text
+                          fontFamily="'IBM Plex Mono', monospace"
+                          fontSize="10px"
+                          color="#555"
+                          letterSpacing="0.08em"
+                          mb="4px"
+                          ml="2px"
+                          textTransform="uppercase"
+                        >
+                          {msg.username}
+                        </Text>
                       )}
                       <Box
                         bg={mine ? "#f5f5f5" : "#131313"}
                         color={mine ? "#0a0a0a" : "#e5e5e5"}
                         border={mine ? "none" : "1px solid #1e1e1e"}
-                        borderRadius={mine ? (prevSame ? "16px 4px 4px 16px" : "16px 4px 16px 16px") : (prevSame ? "4px 16px 16px 4px" : "4px 16px 16px 16px")}
-                        px={4} py={3}
+                        borderRadius={
+                          mine
+                            ? prevSame
+                              ? "16px 4px 4px 16px"
+                              : "16px 4px 16px 16px"
+                            : prevSame
+                              ? "4px 16px 16px 4px"
+                              : "4px 16px 16px 16px"
+                        }
+                        px={4}
+                        py={3}
                       >
-                        <Text fontSize="14px" lineHeight="1.55" fontWeight={mine ? "500" : "400"} whiteSpace="pre-wrap" wordBreak="break-word">{msg.message}</Text>
+                        <Text
+                          fontSize="14px"
+                          lineHeight="1.55"
+                          fontWeight={mine ? "500" : "400"}
+                          whiteSpace="pre-wrap"
+                          wordBreak="break-word"
+                        >
+                          {msg.message}
+                        </Text>
                         {msg.timestamp && (
-                          <Text fontFamily="'IBM Plex Mono', monospace" fontSize="9px" color={mine ? "#888" : "#3a3a3a"} mt="4px" textAlign="right" letterSpacing="0.04em">{formatTime(msg.timestamp)}</Text>
+                          <Text
+                            fontFamily="'IBM Plex Mono', monospace"
+                            fontSize="9px"
+                            color={mine ? "#888" : "#3a3a3a"}
+                            mt="4px"
+                            textAlign="right"
+                            letterSpacing="0.04em"
+                          >
+                            {formatTime(msg.timestamp)}
+                          </Text>
                         )}
                       </Box>
                     </Box>
@@ -205,9 +314,31 @@ const Portal = () => {
                 );
               })
             ) : (
-              <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="40vh" opacity={0.3}>
-                <Text fontFamily="'IBM Plex Mono', monospace" fontSize="28px" color="#333" mb={2}>◌</Text>
-                <Text fontFamily="'IBM Plex Mono', monospace" fontSize="11px" color="#444" letterSpacing="0.12em" textTransform="uppercase">No messages yet</Text>
+              <Box
+                display="flex"
+                flexDirection="column"
+                alignItems="center"
+                justifyContent="center"
+                height="40vh"
+                opacity={0.3}
+              >
+                <Text
+                  fontFamily="'IBM Plex Mono', monospace"
+                  fontSize="28px"
+                  color="#333"
+                  mb={2}
+                >
+                  ◌
+                </Text>
+                <Text
+                  fontFamily="'IBM Plex Mono', monospace"
+                  fontSize="11px"
+                  color="#444"
+                  letterSpacing="0.12em"
+                  textTransform="uppercase"
+                >
+                  No messages yet
+                </Text>
               </Box>
             )}
             <div ref={bottomRef} />
@@ -215,10 +346,25 @@ const Portal = () => {
         </Box>
 
         {/* INPUT */}
-        <Box borderTop="1px solid #1a1a1a" bg="rgba(8,8,8,0.98)" px={5} py={4} flexShrink={0}>
+        <Box
+          borderTop="1px solid #1a1a1a"
+          bg="rgba(8,8,8,0.98)"
+          px={5}
+          py={4}
+          flexShrink={0}
+        >
           <form onSubmit={handleSubmit}>
             <HStack spacing={3} align="flex-end">
-              <Box className="textarea-wrap" flex="1" bg="#0f0f0f" border="1px solid #2a2a2a" borderRadius="14px" px={4} py="10px" transition="border-color 0.2s">
+              <Box
+                className="textarea-wrap"
+                flex="1"
+                bg="#0f0f0f"
+                border="1px solid #2a2a2a"
+                borderRadius="14px"
+                px={4}
+                py="10px"
+                transition="border-color 0.2s"
+              >
                 <Textarea
                   placeholder="Type a message… (Enter to send)"
                   value={messageNew.message}

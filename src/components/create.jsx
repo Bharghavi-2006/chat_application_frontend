@@ -36,15 +36,11 @@ const Create = () => {
       const { room_code, password, username } = formData;
       const payload = { room_code, password, username };
       console.log("here its okay");
-      const res = await axios.post(
-        "http://localhost:3001/api/create",
-        payload,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const res = await axios.post("/api/create", payload, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
       console.log(res.data);
       console.log(res.data.success);
       if (res.data.success) {
